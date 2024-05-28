@@ -359,9 +359,9 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
 
     public void connect() throws IOException {
 
-        String hostName = "localhost";
+        String hostName = "10.210.105.181";
         //hostName = "192.168.86.68";
-        int portNumber = 1024;
+        int portNumber = 1023;
         Socket serverSocket = new Socket(hostName, portNumber);
 
         out = new PrintWriter(serverSocket.getOutputStream(), true);
