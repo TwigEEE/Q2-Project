@@ -1,13 +1,8 @@
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.io.BufferedReader;
-import java.io.EOFException;
-
-import java.util.ArrayList;
 
 
 public class ServerThread implements Runnable {
@@ -25,7 +20,7 @@ public class ServerThread implements Runnable {
     public ServerThread(Socket clientSocket, Manager manager, int id) {
         this.clientSocket = clientSocket;
         this.manager = manager;
-        this.player = new Player(id, "");
+        this.player = new Player(id, "", "MudWyvern");
 
         currentGame = null;
         updating = false;

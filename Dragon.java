@@ -1,16 +1,25 @@
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class Dragon implements Serializable {
     
     private String name;
     private String imageURL;
-    private int x;
-    private int y;
+    private String projectileURL;
+    private int size;
+    private int speed;
+    private int damage;
 
-    public Dragon(String name, String imageURL) {
+    public Dragon(String name, String imageURL, String projectileURL, int size, int speed, int damage) {
         this.name = name;
         this.imageURL = imageURL;
+        this.projectileURL = projectileURL;
+        this.size = size;
+        this.speed = speed;
+        this.damage = damage;
+    }
+
+    public Dragon(String name) {
+        this.name = name;
     }
 
 
@@ -22,65 +31,32 @@ public class Dragon implements Serializable {
         return imageURL;
     }
 
+    public String getProjectileURL() {
+        return projectileURL;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
     public String toString() {
         return name;
     }
 
-    public void setPos(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public int getSpeed() {
+        return speed;
     }
 
-    public int getX() {
-        return x;
+    public int getDamage() {
+        return damage;
     }
 
-    public int getY() {
-        return y;
+
+
+    public int hashCode() {
+        return (int)(name.charAt(0));
     }
 
-    public void step(ArrayList<Dragon> enemies) {
-        Dragon closestEnemy = enemies.get(0);
-        double closestDistance = Math.sqrt(Math.pow(((double)x - closestEnemy.getX()), 2.0) + Math.pow(((double)y - closestEnemy.getY()), 2.0));
-        for (int i = 0; i < enemies.size(); i++) {
-            if (Math.sqrt(Math.pow(((double)x - enemies.get(i).getX()), 2.0) + Math.pow(((double)y - enemies.get(i).getY()), 2.0)) < closestDistance) {
-                closestEnemy = enemies.get(i);
-                closestDistance = Math.sqrt(Math.pow(((double)x - enemies.get(i).getX()), 2.0) + Math.pow(((double)y - enemies.get(i).getY()), 2.0));
-            }
-        }
 
-        if (x > closestEnemy.getX()) {
-            if (y > closestEnemy.getY()) {
-                x -= 3;
-                y -= 3;
-            }
-            else if (y < closestEnemy.getY()) {
-                x -= 3;
-                y += 3;
-            }
-            else {
-                x -= 5;
-            }
-        } else if (x < closestEnemy.getX()) {
-            if (y > closestEnemy.getY()) {
-                x += 3;
-                y -= 3;
-            }
-            else if (y < closestEnemy.getY()) {
-                x += 3;
-                y += 3;
-            }
-            else {
-                x += 5;
-            }
-        } else {
-            if (y < closestEnemy.getY()) {
-                y += 5;
-            }
-            else if (y > closestEnemy.getY()) {
-                y -= 5;
-            }
-        }
-    }
 
 }

@@ -1,7 +1,3 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-
 public class Manager {
 
     private HashMap<Integer, ServerThread> threads;
@@ -29,10 +25,10 @@ public class Manager {
 
     public Game getOpenGame() {
 
-        Set<Integer> keys = games.keySet();
-        for (Integer key : keys) {
-            if (games.get(key).getStatus().equals("open")) {
-                return games.get(key);
+        DLList<Integer> keys = games.keySet().toDLList();
+        for (int i = 0; i < keys.size(); i++) {
+            if (games.get(keys.get(i)).getStatus().equals("open")) {
+                return games.get(keys.get(i));
             }
         }
         return null;

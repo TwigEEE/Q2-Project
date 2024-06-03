@@ -1,5 +1,4 @@
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class Game implements Serializable {
     
@@ -84,6 +83,10 @@ public class Game implements Serializable {
 
     public ArrayList<Projectile> getProjectiles() {
         return projectiles;
+    }
+
+    public int hashCode() {
+        return id;
     }
 
 

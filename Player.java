@@ -17,9 +17,10 @@ public class Player implements Serializable {
     private int currentURL;
 
 
-    public Player(int id, String username) {
+    public Player(int id, String username, String dragonName) {
         this.id = id;
         this.username = username;
+        this.dragonName = dragonName;
 
         ready = false;
         x = 0;
@@ -28,7 +29,6 @@ public class Player implements Serializable {
         yMove = 0;
         health = 100;
 
-        dragonName = "MudWyvern";
         currentURL = 1;
 
     }
@@ -78,9 +78,13 @@ public class Player implements Serializable {
         this.yMove = y;
     }
 
-    public void move() {
-        x += xMove;
-        y += yMove;
+    public void move(int speed) {
+        if (x + xMove >= 0 && x + xMove <= 1160) {
+            x += xMove * speed;
+        }
+        if (y + yMove >= 0 && y + yMove <= 1140) {
+            y += yMove * speed;
+        }
     }
 
     public void takeDamage(int damage) {
@@ -100,6 +104,14 @@ public class Player implements Serializable {
 
     public String getGifURL() {
         return "images/" + dragonName + currentURL + ".png";
+    }
+
+    public String getDragonName() {
+        return dragonName;
+    }
+
+    public void setDragonName(String dragonName) {
+        this.dragonName = dragonName;
     }
 
 

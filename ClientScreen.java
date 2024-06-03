@@ -9,11 +9,8 @@ import java.awt.event.KeyEvent;
 import java.io.*;
 import java.net.*;
 import javax.imageio.ImageIO;
-import java.util.ArrayList;
-
-
-import java.util.HashMap;
-
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 
 public class ClientScreen extends JPanel implements ActionListener, MouseListener, KeyListener {
@@ -21,10 +18,15 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
     private JTextField usernameField;
     private JButton playB;
     private JButton tutorialB;
-    public JButton returnB;
+    private JButton returnB;
+    private JButton exitTutorialB;
 
     private JButton exitGameB;
     private JButton readyB;
+
+    private JButton selectMud;
+    private JButton selectPygmy;
+    private JButton selectViridian;
 
 
 
@@ -41,7 +43,7 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
     private ArrayList<Projectile> projectiles;
 
 
-    private HashMap<String, Dragon> dragonInfo;
+    private HashMap<Dragon, Dragon> dragonInfo;
 
 
     public ClientScreen() {
@@ -50,19 +52,13 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
         currentScreen = "mainMenu";
         players = new ArrayList<Player>();   
         projectiles = new ArrayList<Projectile>();
-        player = new Player(0, "");
+        player = new Player(0, "", "MudWyvern");
 
 
-
-        dragonInfo = new HashMap<String, Dragon>();
-        dragonInfo.put("Rory Wyvern", new Dragon("Rory Wyvern", "images/PygmyWyvern.png"));
-        dragonInfo.put("Mud Wyvern", new Dragon("Mud Wyvern", "images/MudWyvern.png"));
-
-
-    
-
-
-
+        dragonInfo = new HashMap<Dragon, Dragon>();
+        dragonInfo.put(new Dragon("Mud Wyvern"), new Dragon("Mud Wyvern", "images/MudWyvern1.png", "images/fireball.png", 48, 15, 20));
+        dragonInfo.put(new Dragon("Pygmy Wyvern"), new Dragon("Pygmy Wyvern", "images/PygmyWyvern2.png", "images/fireball.png", 48, 25, 15));
+        dragonInfo.put(new Dragon("Viridian Drake"), new Dragon("Viridian Drake", "images/ViridianDrake4.png", "images/fireball.png", 48, 10, 25));
 
 
 
@@ -101,6 +97,12 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
         returnB.setFocusable(false);
         returnB.setVisible(false);
 
+        exitTutorialB = new JButton("BACK");
+        exitTutorialB.setBounds(10, 750, 100, 50);
+        this.add(exitTutorialB);
+        exitTutorialB.addActionListener(this);
+        exitTutorialB.setVisible(false);
+
         exitGameB = new JButton();
         exitGameB.setBounds(444, 675, 311, 101);
         this.add(exitGameB);
@@ -122,6 +124,30 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
         readyB.setFocusPainted(false);
         readyB.setFocusable(false);
         readyB.setVisible(false);
+
+        Icon icon = new ImageIcon("images/MudWyvern1.png");
+        selectMud = new JButton(icon);
+        selectMud.setBounds(120, 150, 100, 100);
+        this.add(selectMud);
+        selectMud.addActionListener(this);
+        selectMud.setVisible(false);
+        selectMud.setFocusable(false);
+
+        icon = new ImageIcon("images/PygmyWyvern1.png");
+        selectPygmy = new JButton(icon);
+        selectPygmy.setBounds(120, 270, 100, 100);
+        this.add(selectPygmy);
+        selectPygmy.addActionListener(this);
+        selectPygmy.setVisible(false);
+        selectPygmy.setFocusable(false);
+
+        icon = new ImageIcon("images/ViridianDrake1.png");
+        selectViridian = new JButton(icon);
+        selectViridian.setBounds(120, 390, 100, 100);
+        this.add(selectViridian);
+        selectViridian.addActionListener(this);
+        selectViridian.setVisible(false);
+        selectViridian.setFocusable(false);
 
         
 
@@ -147,6 +173,12 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
                 e.printStackTrace();
             }
 
+        } else if (currentScreen.equals("tutorial")) {
+            try {
+                g.drawImage(ImageIO.read(new File("images/tutorial.png")), 0, 0, null);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else if (currentScreen.equals("lobby")) {
             try {
                 g.drawImage(ImageIO.read(new File("images/lobby.png")), 0, 0, null);
@@ -167,7 +199,7 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
                 g.setFont(new Font("SansSerif", Font.PLAIN, 24));
                 g.drawString(players.get(i).getUsername(), 420 + 170 * i, 60);
                 try {
-                    g.drawImage(ImageIO.read(new File(player.getGifURL())), 440 + 170 * i, 80, null);
+                    g.drawImage(ImageIO.read(new File(players.get(i).getGifURL())), 440 + 170 * i, 80, null);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -182,18 +214,27 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
 
             
             try {
-                //g.drawImage(ImageIO.read(new File("images/battleBackground.png")), -1*player.getX() + 576, player.getY() - 1500 + 376 + 48, null);
-                g.drawImage(new ImageIcon(getClass().getResource(player.getGifURL())).getImage(), 576 - 24, 376 - 24, null);
+                g.drawImage(ImageIO.read(new File("images/battleBackground.png")), -1*player.getX() + 560, player.getY() - 1200 + 360 + dragonInfo.get(new Dragon(player.getDragonName())).getSize(), null);
+                g.drawImage(new ImageIcon(getClass().getResource(player.getGifURL())).getImage(), (int)(576 - 0.5 * dragonInfo.get(new Dragon(player.getDragonName())).getSize()), (int)(376 - 0.5 * dragonInfo.get(new Dragon(player.getDragonName())).getSize()), null);
+                g.setColor(Color.RED);
+                g.fillRect((int)(576 - 0.5 * dragonInfo.get(new Dragon(player.getDragonName())).getSize()), (int)(366 - 0.5 * dragonInfo.get(new Dragon(player.getDragonName())).getSize()), 50 * player.getHealth() / 100, 10);
 
 
                 for (int i = 0; i < players.size(); i++) {
                     if (!players.get(i).equals(player)) {
-                        g.drawImage(new ImageIcon(getClass().getResource(player.getGifURL())).getImage(), players.get(i).getX() - player.getX() + 576 - 24, player.getY() - players.get(i).getY() + 376 - 24, null);
+                        g.drawImage(new ImageIcon(getClass().getResource(players.get(i).getGifURL())).getImage(), players.get(i).getX() - player.getX() + 576 - 24, player.getY() - players.get(i).getY() + 376 - 24, null);
+                        g.setColor(Color.RED);
+                        g.fillRect(players.get(i).getX() - player.getX() + 576 - 24, player.getY() - players.get(i).getY() + 366 - 24, 50 * players.get(i).getHealth() / 100, 10);
+
                     }
                 }
 
                 for (int i = 0; i < projectiles.size(); i++) {
-                    g.fillOval(projectiles.get(i).getX() - player.getX() + 576, player.getY() - projectiles.get(i).getY() + 376, 15, 15);
+                    try {
+                        g.drawImage(ImageIO.read(new File("images/fireball.png")), projectiles.get(i).getX() - player.getX() + 576, player.getY() - projectiles.get(i).getY() + 376, null);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
             } catch (Exception e) {
@@ -233,7 +274,19 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
             tutorialB.setVisible(false);
             exitGameB.setVisible(true);
             readyB.setVisible(true);
+            selectMud.setVisible(true);
+            selectPygmy.setVisible(true);
+            selectViridian.setVisible(true);
             currentScreen = "lobby";
+
+            try {
+                URL url = this.getClass().getClassLoader().getResource("sounds/button.wav");
+                Clip clip = AudioSystem.getClip();
+                clip.open(AudioSystem.getAudioInputStream(url));
+                clip.start();
+            } catch (Exception exc) {
+                exc.printStackTrace(System.out);
+            }
             repaint();
         }
 
@@ -243,7 +296,35 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
             tutorialB.setVisible(false);
             exitGameB.setVisible(false);
             readyB.setVisible(false);
+            exitTutorialB.setVisible(true);
             currentScreen = "tutorial";
+
+            try {
+                URL url = this.getClass().getClassLoader().getResource("sounds/button.wav");
+                Clip clip = AudioSystem.getClip();
+                clip.open(AudioSystem.getAudioInputStream(url));
+                clip.start();
+            } catch (Exception exc) {
+                exc.printStackTrace(System.out);
+            }
+            repaint();
+        }
+
+        if (e.getSource() == exitTutorialB) {
+            usernameField.setVisible(true);
+            playB.setVisible(true);
+            tutorialB.setVisible(true);
+            exitTutorialB.setVisible(false);
+            currentScreen = "mainMenu";
+
+            try {
+                URL url = this.getClass().getClassLoader().getResource("sounds/button.wav");
+                Clip clip = AudioSystem.getClip();
+                clip.open(AudioSystem.getAudioInputStream(url));
+                clip.start();
+            } catch (Exception exc) {
+                exc.printStackTrace(System.out);
+            }
             repaint();
         }
 
@@ -255,6 +336,15 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
             readyB.setVisible(false);
             returnB.setVisible(false);
             currentScreen = "mainMenu";
+
+            try {
+                URL url = this.getClass().getClassLoader().getResource("sounds/button.wav");
+                Clip clip = AudioSystem.getClip();
+                clip.open(AudioSystem.getAudioInputStream(url));
+                clip.start();
+            } catch (Exception exc) {
+                exc.printStackTrace(System.out);
+            }
             repaint();
         }
 
@@ -267,15 +357,80 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
             tutorialB.setVisible(true);
             exitGameB.setVisible(false);
             readyB.setVisible(false);
+            selectMud.setVisible(false);
+            selectPygmy.setVisible(false);
+            selectViridian.setVisible(false);
             currentScreen = "mainMenu";
+
+            try {
+                URL url = this.getClass().getClassLoader().getResource("sounds/button.wav");
+                Clip clip = AudioSystem.getClip();
+                clip.open(AudioSystem.getAudioInputStream(url));
+                clip.start();
+            } catch (Exception exc) {
+                exc.printStackTrace(System.out);
+            }
             repaint();
         }
 
         if (e.getSource() == readyB) {
             out.println("ready?");
+
+            try {
+                URL url = this.getClass().getClassLoader().getResource("sounds/button.wav");
+                Clip clip = AudioSystem.getClip();
+                clip.open(AudioSystem.getAudioInputStream(url));
+                clip.start();
+            } catch (Exception exc) {
+                exc.printStackTrace(System.out);
+            }
             repaint();
         }
 
+        if (e.getSource() == selectMud) {
+            player.setDragonName("MudWyvern");
+            out.println("repl?" + player.toString());
+
+            try {
+                URL url = this.getClass().getClassLoader().getResource("sounds/button.wav");
+                Clip clip = AudioSystem.getClip();
+                clip.open(AudioSystem.getAudioInputStream(url));
+                clip.start();
+            } catch (Exception exc) {
+                exc.printStackTrace(System.out);
+            }
+            repaint();
+        }
+
+        if (e.getSource() == selectPygmy) {
+            player.setDragonName("PygmyWyvern");
+            out.println("repl?" + player.toString());
+
+            try {
+                URL url = this.getClass().getClassLoader().getResource("sounds/button.wav");
+                Clip clip = AudioSystem.getClip();
+                clip.open(AudioSystem.getAudioInputStream(url));
+                clip.start();
+            } catch (Exception exc) {
+                exc.printStackTrace(System.out);
+            }
+            repaint();
+        }
+
+        if (e.getSource() == selectViridian) {
+            player.setDragonName("ViridianDrake");
+            out.println("repl?" + player.toString());
+
+            try {
+                URL url = this.getClass().getClassLoader().getResource("sounds/button.wav");
+                Clip clip = AudioSystem.getClip();
+                clip.open(AudioSystem.getAudioInputStream(url));
+                clip.start();
+            } catch (Exception exc) {
+                exc.printStackTrace(System.out);
+            }
+            repaint();
+        }
 
 
     }
@@ -301,6 +456,16 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
 
             out.println("crprojectile?" + player.getID() + "," + player.getX() + "," + player.getY() + "," + xMove + "," + yMove + "!");
      
+            try {
+                URL url = this.getClass().getClassLoader().getResource("sounds/shoot.wav");
+                Clip clip = AudioSystem.getClip();
+                clip.open(AudioSystem.getAudioInputStream(url));
+                clip.start();
+            } catch (Exception exc) {
+                exc.printStackTrace(System.out);
+            }
+
+            
             repaint();
         }
     }
@@ -314,19 +479,19 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
     public void keyPressed(KeyEvent e) {
         if (currentScreen.equals("game")) {
             if (e.getKeyCode() == 87) {
-                player.setYMove(20);
+                player.setYMove(1);
                 out.println("repl?" + player.toString());
             }
             if (e.getKeyCode() == 68) {
-                player.setXMove(20);
+                player.setXMove(1);
                 out.println("repl?" + player.toString());
             }
             if (e.getKeyCode() == 83) {
-                player.setYMove(-20);
+                player.setYMove(-1);
                 out.println("repl?" + player.toString());
             }
             if (e.getKeyCode() == 65) {
-                player.setXMove(-20);
+                player.setXMove(-1);
                 out.println("repl?" + player.toString());
             }
         }
@@ -359,8 +524,8 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
 
     public void connect() throws IOException {
 
-        String hostName = "10.210.105.181";
-        //hostName = "192.168.86.68";
+        //String hostName = "10.210.105.181";
+        String hostName = "localHost";
         int portNumber = 1023;
         Socket serverSocket = new Socket(hostName, portNumber);
 
@@ -385,6 +550,11 @@ public class ClientScreen extends JPanel implements ActionListener, MouseListene
                         request = request.substring(request.indexOf("&&") + 2);
                     }
                 } else if (command.equals("stg")) {
+                    player.setPos((int)(Math.random() * 1160), (int)(Math.random() * 1140));
+                    out.println("repl?" + player.toString());
+                    selectMud.setVisible(false);
+                    selectPygmy.setVisible(false);
+                    selectViridian.setVisible(false);
                     currentScreen = "game";
                 } else if (command.equals("reprojectiles")) {
                     projectiles.clear();
